@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group 'com.teamtreehouse'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.10.Final'
+    testCompile group: 'com.h2database', name: 'h2', version: '1.4.191'
+//    testCompile group: 'com.h2database:h2:1.4.191'
+    
+    // JTA -> java transaction api -> to use transaction with hibernate
+    compile group: 'javax.transaction', name: 'jta', version: '1.1'
+
+
+
+
+}
