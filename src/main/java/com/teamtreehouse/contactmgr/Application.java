@@ -8,6 +8,8 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
 public class Application {
@@ -57,6 +59,32 @@ public class Application {
         System.out.printf("%n%nUpdate Complete!%n%n");
         fetchAllContacts().stream().forEach(System.out::println);
 
+
+        // delete the contact with id = 1
+        c = findContactById(1);
+        System.out.printf("%nDeleting...%n");
+        delete(c);
+        System.out.printf("%nDeleted!%n");
+        System.out.printf("%nAfter delete%n");
+        fetchAllContacts().stream().forEach(System.out::println);
+
+    }
+
+    private static void delete(Contact contact) {
+        // Open a session
+        Session session = sessionFactory.openSession();
+
+        // Begin a transaction
+        session.beginTransaction();
+
+        // Use the session to update the contact
+        session.delete(contact);
+
+        // Commit the transaction
+        session.getTransaction().commit();
+
+        // Close the session
+        session.close();
     }
 
     private static Contact findContactById(int id) {
@@ -78,21 +106,31 @@ public class Application {
         session.close();
     }
 
-    @SuppressWarnings("unchecked")
     private static List<Contact> fetchAllContacts() {
+        // Open a session
         Session session = sessionFactory.openSession();
 
-        // create criteria object
-        Criteria criteria = session.createCriteria(Contact.class);
-        /*
-        we can add some filters to the criteria object like return all records which their email contains
-        a specific string but now don't change it
-         */
+        // DEPRECATED: Create Criteria
+        // Criteria criteria = session.createCriteria(Contact.class);
 
-        // create the list of contacts according to the criteria object
-        List<Contact> contacts = criteria.list(); // suppress the warning of this line
+        // DEPRECATED: Get a list of Contact objects according to the Criteria object
+        // List<Contact> contacts = criteria.list();
 
+        // UPDATED: Create CriteriaBuilder
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+
+        // UPDATED: Create CriteriaQuery
+        CriteriaQuery<Contact> criteria = builder.createQuery(Contact.class);
+
+        // UPDATED: Specify criteria root
+        criteria.from(Contact.class);
+
+        // UPDATED: Execute query
+        List<Contact> contacts = session.createQuery(criteria).getResultList();
+
+        // Close the session
         session.close();
+
         return contacts;
     }
 
