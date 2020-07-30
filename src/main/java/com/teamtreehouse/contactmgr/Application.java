@@ -1,11 +1,14 @@
 package com.teamtreehouse.contactmgr;
 
 import com.teamtreehouse.contactmgr.model.Contact;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
+
+import java.util.List;
 
 public class Application {
     // a static unique reference to SessionFactory (since it's heavy object and we need only one)
@@ -37,6 +40,35 @@ public class Application {
                 .withPhone(7735556666L)
                 .build();
 
+        save(contact);
+
+        // display a list of contacts
+//        for (Contact c : fetchAllContacts()) {
+//            System.out.println(c);
+//        }
+        fetchAllContacts().stream().forEach(System.out::println);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Contact> fetchAllContacts() {
+        Session session = sessionFactory.openSession();
+
+        // create criteria object
+        Criteria criteria = session.createCriteria(Contact.class);
+        /*
+        we can add some filters to the criteria object like return all records which their email contains
+        a specific string but now don't change it
+         */
+
+        // create the list of contacts according to the criteria object
+        List<Contact> contacts = criteria.list(); // suppress the warning of this line
+
+        session.close();
+        return contacts;
+    }
+
+    private static void save(Contact contact) {
         // open session
         Session session = sessionFactory.openSession();
 
@@ -57,4 +89,6 @@ public class Application {
         // close the hibernate session
         session.close();
     }
+
+
 }

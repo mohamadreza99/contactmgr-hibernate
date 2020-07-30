@@ -6,9 +6,9 @@
         <!--SQL dialect-->
         <property name="dialect">org.hibernate.dialect.H2Dialect</property>
 
-        <!--create the database schema on application startup based on the hibernate annotations-->
+        <!--update the database schema on application startup based on the hibernate annotations-->
         <!--hbm2ddl = hibernate mapping to data definition language-->
-        <property name="hbm2ddl.auto">create</property>
+        <property name="hbm2ddl.auto">update</property>
 
 
         <!--show the queries prepared by hibernate -> optional property-->
