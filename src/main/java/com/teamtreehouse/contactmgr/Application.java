@@ -40,14 +40,42 @@ public class Application {
                 .withPhone(7735556666L)
                 .build();
 
-        save(contact);
+        int id = save(contact);
 
-        // display a list of contacts
+        // display a list of contacts before the update
 //        for (Contact c : fetchAllContacts()) {
 //            System.out.println(c);
 //        }
+        System.out.printf("%n%nBefore update%n%n");
         fetchAllContacts().stream().forEach(System.out::println);
 
+        // get the persisted contacts saved to the db and update it and update and persist changes
+        Contact c = findContactById(id);
+        c.setFirstName("Mike");
+        System.out.printf("%n%nUpdating...%n%n");
+        update(c);
+        System.out.printf("%n%nUpdate Complete!%n%n");
+        fetchAllContacts().stream().forEach(System.out::println);
+
+    }
+
+    private static Contact findContactById(int id) {
+        Session session = sessionFactory.openSession();
+        Contact contact= session.get(Contact.class, id);
+        session.close();
+        return contact;
+    }
+
+    private static void update(Contact contact) {
+        Session session = sessionFactory.openSession();
+
+        // begin a transaction
+        session.beginTransaction();
+        // use the session to update the contact
+        session.update(contact);
+        // commit the transaction
+        session.getTransaction().commit();
+        session.close();
     }
 
     @SuppressWarnings("unchecked")
@@ -68,7 +96,7 @@ public class Application {
         return contacts;
     }
 
-    private static void save(Contact contact) {
+    private static int save(Contact contact) {
         // open session
         Session session = sessionFactory.openSession();
 
@@ -81,13 +109,18 @@ public class Application {
         session.beginTransaction();
 
         // use the session to save the contact
-        session.save(contact); // the contact class must be annotated with jpa annotation which we have done
+        /*
+        session.save() method returns a serializable object that contains the id either assigned auto by the hibernate or
+        we give that id in the code
+         */
+        int id = (int) session.save(contact); // the contact class must be annotated with jpa annotation which we have done
 
         // commit the transaction to finalize the transaction to the db
         session.getTransaction().commit();
 
         // close the hibernate session
         session.close();
+        return id;
     }
 
 
